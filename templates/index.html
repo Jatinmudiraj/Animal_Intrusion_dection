@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Animal Detection Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+ 
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="#">AnimalDetect</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Live Detection</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Video Analysis</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Image Slider
+<div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="https://images.pexels.com/photos/145939/pexels-photo-145939.jpeg?auto=compress&cs=tinysrgb&h=400&w=1200" class="d-block w-100" alt="Lion">
+        </div>
+        <div class="carousel-item">
+            <img src="https://images.pexels.com/photos/247376/pexels-photo-247376.jpeg?auto=compress&cs=tinysrgb&h=400&w=1200" class="d-block w-100" alt="Tiger">
+        </div>
+        <div class="carousel-item">
+            <img src="https://images.pexels.com/photos/33392/portrait-wildlife-animal-africa.jpg?auto=compress&cs=tinysrgb&h=400&w=1200" class="d-block w-100" alt="Elephant">
+        </div>
+       
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </button>
+</div> -->
+
+
+
+<!-- Image Slider -->
+<div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="{{ url_for('static', filename='images/328597.jpg') }}" class="d-block w-100" alt="Animal">
+        </div>
+        <div class="carousel-item">
+            <img src="{{ url_for('static', filename='images/8522300.jpg') }}" class="d-block w-100" alt="Tiger">
+        </div>
+        <div class="carousel-item">
+            <img src="{{ url_for('static', filename='images/antelope-11.jpg') }}" class="d-block w-100" alt="Elephant1">
+        </div>
+        <div class="carousel-item">
+            <img src="{{ url_for('static', filename='images/OIP.jpeg') }}" class="d-block w-100" alt="Elephant2">
+        </div>
+        <div class="carousel-item">
+            <img src="{{ url_for('static', filename='images/OIP (1).jpeg') }}" class="d-block w-100" alt="Elephant3">
+        </div>
+        <div class="carousel-item">
+            <img src="{{ url_for('static', filename='images/OIP (2).jpeg') }}" class="d-block w-100" alt="Elephant4">
+        </div>
+        <div class="carousel-item">
+            <img src="{{ url_for('static', filename='images/thumb-1920-699228.png') }}" class="d-block w-100" alt="Elephant5">
+        </div>
+        <div class="carousel-item">
+            <img src="{{ url_for('static', filename='images/wp15163159-hyena-4k-wallpapers.webp') }}" class="d-block w-100" alt="Elephant7">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </button>
+</div>
+
+
+
+<!-- In Video Animal Detection Modal -->
+<div class="modal fade" id="inVideoModal" tabindex="-1" aria-labelledby="inVideoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Upload Video for Animal Detection</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="inVideoForm" method="POST" action="/upload-video" enctype="multipart/form-data">
+                    
+                    <!-- File Upload with Preview -->
+                    <h6 class="mb-2">Select a Video File:</h6>
+                    <div class="mb-3">
+                        <input type="file" class="form-control" name="video_file" accept="video/*" id="videoUpload" required>
+                        <video id="videoPreview" class="mt-3 w-100 d-none" controls></video>
+                    </div>
+
+
+                    <h4>Select image for annotation</h4>
+                    <input type="file" id="imageInput" accept="image/*" class="imageInput form-control mb-3">
+
+                    <canvas id="canvas" class="canvas" style="border: 1px solid #333; height: 480px;"></canvas>
+                    <button type="button" class="rst-btn btn btn-primary mt-2">Reset</button>
+                    <div id="output" class="output mt-3" style="white-space: pre-wrap;"></div>
+
+                    <!-- Hidden Fields -->
+                    <input type="hidden" name="line1" class="line1" id="line1">
+                    <input type="hidden" name="line2" class="line2" id="line2">
+                    <input type="hidden" name="areas" class="areas" id="areas">
+                    <input type="hidden" name="_N" value="0">
+                    <input type="hidden" name="_C" value="1">
+                    <input type="hidden" name="_H" value="2">
+                    <input type="hidden" name="_W" value="3">
+                <!-- </div> -->
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Upload & Detect </button>
+                </div>
+
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('videoUpload').addEventListener('change', function(event) {
+        let file = event.target.files[0];
+        let videoPreview = document.getElementById('videoPreview');
+
+        if (file) {
+            let fileURL = URL.createObjectURL(file);
+            videoPreview.src = fileURL;
+            videoPreview.classList.remove('d-none');
+        }
+    });
+</script>
+
+
+
+<!-- Tool Buttons -->
+<section class="container text-center my-5">
+    <h3 class="mb-4">Try Some of Our Tools</h3>
+    <div class="row justify-content-center">
+        <div class="col-md-4 mb-3">
+            <button class="btn btn-outline-primary btn-lg w-100" data-bs-toggle="modal" data-bs-target="#coordinateModal">Live Video Animal Detection</button>
+        </div>
+        <div class="col-md-4 mb-3">
+            <!-- In Video Animal Detection Button -->
+<button class="btn btn-outline-success btn-lg w-100" data-bs-toggle="modal" data-bs-target="#inVideoModal">
+    In Video Animal Detection
+</button>
+
+        </div>
+    </div>
+</section>
+
+<!-- Features and Advantages -->
+<section class="container my-5">
+    <h4 class="mb-3">Features and Advantages</h4>
+    <p>
+        Our animal detection system uses cutting-edge deep learning models to detect animals in real-time from live feeds and pre-recorded videos. 
+        With high accuracy and speed, it is ideal for wildlife monitoring, security surveillance, and smart farming applications.
+        Additional features include multi-animal tracking, behavior analysis, and alert notifications.
+    </p>
+</section>
+
+<div class="container mt-5">
+    <h2>Click on the Image to Annotate</h2>
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#coordinateModal">Open Annotator</button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="coordinateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <form method="POST" action="/submit-coordinates" id="coordinateForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Image Annotation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- File input for uploading an image -->
+                    <input type="file" id="imageInput_1"  accept="image/*" class="imageInput form-control mb-3">
+                    <canvas id="canvas_1" class="canvas" style="border: 1px solid #333; width: 640px; height: 480px;"></canvas>
+                    <button type="button" class="rst-btn btn btn-primary mt-2">Reset</button>
+                    <div id="output_1" class="output mt-3" style="white-space: pre-wrap;"></div>
+
+                    <!-- Hidden Fields -->
+                    <input type="hidden" name="line1" class="line1" id="line1_1">
+                    <input type="hidden" name="line2" class="line2" id="line2_1">
+                    <input type="hidden" name="areas" class="areas" id="areas_1">
+                    <input type="hidden" name="_N" value="0">
+                    <input type="hidden" name="_C" value="1">
+                    <input type="hidden" name="_H" value="2">
+                    <input type="hidden" name="_W" value="3">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-3 mt-5">
+    <div class="container text-center">
+        &copy; 2025 AnimalDetect. All rights reserved.
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+
+const canvases = document.getElementsByClassName('canvas');
+  const imageInputs = document.getElementsByClassName('imageInput');
+  const line1Fields = document.getElementsByClassName('line1');
+  const line2Fields = document.getElementsByClassName('line2');
+  const areasFields = document.getElementsByClassName('areas');
+  const outputs = document.getElementsByClassName('output');
+  const resetButtons = document.getElementsByClassName('rst-btn');
+
+  for (let i = 0; i < canvases.length; i++) {
+    let canvas = canvases[i];
+    let ctx = canvas.getContext('2d');
+    let imageInput = imageInputs[i];
+    let line1Field = line1Fields[i];
+    let line2Field = line2Fields[i];
+    let areasField = areasFields[i];
+    let output = outputs[i];
+    let img = new Image();
+    let imageLoaded = false;
+
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      imageLoaded = true;
+    };
+
+    canvas.addEventListener('click', (e) => {
+      if (!imageLoaded) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = Math.round((e.clientX - rect.left) * scaleX);
+      const y = Math.round((e.clientY - rect.top) * scaleY);
+
+      fetch('/click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ x, y })
+      })
+        .then(res => res.json())
+        .then(data => {
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, 2 * Math.PI);
+          ctx.fillStyle = 'red';
+          ctx.fill();
+
+          updateOutput(data, output, line1Field, line2Field, areasField);
+        });
+    });
+
+    resetButtons[i].addEventListener('click', () => {
+      fetch('/reset', { method: 'POST' }).then(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        img = new Image();
+        imageLoaded = false;
+
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          imageLoaded = true;
+        };
+
+        output.textContent = '';
+        line1Field.value = '';
+        line2Field.value = '';
+        areasField.value = '';
+        imageInput.value = '';
+      });
+    });
+  }
+
+  function updateOutput(data, output, line1Field, line2Field, areasField) {
+    let txt = `Total Clicks: ${data.count}\n\n`;
+    if (data.boundaryLines) {
+      txt += "Boundary Lines:\n";
+      data.boundaryLines.forEach((l, i) => {
+        txt += `Line ${i + 1}: [${l.x1}, ${l.y1}, ${l.x2}, ${l.y2}]\n`;
+      });
+      const l1 = data.boundaryLines[0];
+      const l2 = data.boundaryLines[1];
+      line1Field.value = `${l1.x1},${l1.y1},${l1.x2},${l1.y2}`;
+      line2Field.value = `${l2.x1},${l2.y1},${l2.x2},${l2.y2}`;
+    }
+
+    if (data.areas) {
+      txt += "\nArea Points:\n";
+      data.areas.forEach((p, i) => {
+        txt += `Point ${i + 1}: [${p[0]},${p[1]}]\n`;
+      });
+      areasField.value = data.areas.map(p => `[${p[0]},${p[1]}]`).join(',');
+    }
+
+    output.textContent = txt;
+  }
+
+  console.log('Classname-based multi-canvas script loaded!');
+</script>
+</body>
+</html>
+
