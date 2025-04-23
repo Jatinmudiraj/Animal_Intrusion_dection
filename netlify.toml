@@ -1,0 +1,8 @@
+[build]
+  publish = "static" # or wherever your index.html is located
+  command = ""
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

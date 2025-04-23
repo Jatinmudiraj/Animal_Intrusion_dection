@@ -1,0 +1,9 @@
+Flask
+playsound
+twilio
+numpy
+opencv-python
+scipy
+munkres
+ultralytics
+deep_sort_realtime
