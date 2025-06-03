@@ -424,6 +424,61 @@ class object:
 
 animal_class_ids = [16, 17, 18, 19, 20, 21, 22, 23]  # birds, cats, dogs, horses, sheep, cows, elephants, bears (COCO)
 
+#process frames for render
+@app.route('/process_frame', methods=['POST'])
+def process_frame():
+    global boundaryLines, areas
+
+    # Get base64 image from client
+    data = request.get_json()
+    if 'image' not in data:
+        return jsonify({'error': 'No image received'}), 400
+
+    # Decode base64 image
+    encoded_data = data['image'].split(',')[1]  # Remove 'data:image/jpeg;base64,...'
+    decoded = base64.b64decode(encoded_data)
+    np_img = np.frombuffer(decoded, np.uint8)
+    image = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+
+    outimg = image.copy()
+    results = yolo_model(image)[0]
+    detections = []
+
+    for det in results.boxes.data.tolist():
+        xmin, ymin, xmax, ymax = map(int, det[:4])
+        conf, cls_id = det[4], int(det[5])
+        if conf > 0.5 and cls_id in animal_class_ids:
+            width = xmax - xmin
+            height = ymax - ymin
+            detections.append(([xmin, ymin, width, height], conf, 'animal'))
+
+    tracks = tracker.update_tracks(detections, frame=image)
+    objects = []
+
+    for track in tracks:
+        if not track.is_confirmed():
+            continue
+        track_id = track.track_id
+        l, t, r, b = track.to_ltrb()
+        bbox = [int(l), int(t), int(r), int(b)]
+        if track_id not in tracked_objects:
+            tracked_objects[track_id] = object(bbox, id=track_id)
+        else:
+            tracked_objects[track_id].update(bbox)
+        objects.append(tracked_objects[track_id])
+
+    checkLineCrosses(boundaryLines, objects)
+    checkAreaIntrusion(areas, objects)
+
+    response_data = {
+        "tracks": [
+            {"id": obj.id, "bbox": obj.pos}
+            for obj in objects
+        ]
+    }
+
+    return jsonify(response_data)
+
 def generate_frames():
     global boundaryLines, areas
 
